@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tools Directory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeIn 1s ease;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .category-nav {
+            display: none;
+            margin-bottom: 2rem;
+        }
+
+        .category-nav-toggle {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-nav-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: white;
+            border-radius: 15px;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .category-nav-list.open {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .category-nav-item {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .category-nav-item:last-child {
+            border-bottom: none;
+        }
+
+        .category-nav-item:hover {
+            background: #f7fafc;
+        }
+
+        @media (max-width: 768px) {
+            .category-nav {
+                display: block;
+            }
+        }
+
+        .category-section {
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .category-icon {
+            font-size: 2rem;
+        }
+
+        .category-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .tool-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.3rem;
+        }
+
+        .tier-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .tier-free {
+            background: #48bb78;
+            color: white;
+        }
+
+        .tier-freemium {
+            background: #4299e1;
+            color: white;
+        }
+
+        .tier-paid {
+            background: #ed8936;
+            color: white;
+        }
+
+        .tool-description {
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .tool-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .visit-btn {
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .visit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.5rem;
+            padding: 4rem;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-top: 2rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 AI Tools Directory</h1>
+            <p class="subtitle">Curated by <a href="https://linktr.ee/questrequestvr" target="_blank" style="color: white; text-decoration: underline; font-weight: 600;">QuestRequestVR</a></p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Search tools...">
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="filter-group">
+                <button class="filter-btn active" data-tier="all">All</button>
+                <button class="filter-btn" data-tier="Free">Free</button>
+                <button class="filter-btn" data-tier="Freemium">Freemium</button>
+                <button class="filter-btn" data-tier="Paid">Paid</button>
+            </div>
+        </div>
+
+        <div class="category-nav">
+            <button class="category-nav-toggle" id="categoryToggle">
+                📂 Jump to Category
+                <span id="toggleIcon">▼</span>
+            </button>
+            <div class="category-nav-list" id="categoryList"></div>
+        </div>
+
+        <div id="toolsContainer"></div>
+        <div id="noResults" class="no-results" style="display: none;">
+            No tools found matching your criteria 😕
+        </div>
+    </div>
+
+    <script>
+        const toolsData = {
+            "🎬 Full Video Generation & Cinematic Clips": [
+                {name: "Pika Labs", description: "Text/image to animated videos", tier: "Free", url: "https://pika.art"},
+                {name: "Luma Dream Machine", description: "Text to 4s cinematic videos", tier: "Free", url: "https://lumalabs.ai/dream-machine"},
+                {name: "Fliki", description: "Text-to-video with voiceovers", tier: "Freemium", url: "https://fliki.ai"},
+                {name: "Veed.io", description: "Online video editor with AI tools", tier: "Freemium", url: "https://veed.io"},
+                {name: "Kaiber", description: "Music visualizer and cinematic generator", tier: "Freemium", url: "https://kaiber.ai"},
+                {name: "InVideo", description: "Template-based text-to-video maker", tier: "Freemium", url: "https://invideo.io/ai"},
+                {name: "Lumen5", description: "Blog-to-video content converter", tier: "Freemium", url: "https://lumen5.com"},
+                {name: "RunwayML", description: "Professional AI video and 3D editing suite", tier: "Freemium", url: "https://runwayml.com"},
+                {name: "Genmo", description: "3D world building and video generation", tier: "Paid", url: "https://genmo.ai"}
+            ],
+            "👥 AI Avatar & UGC Creation": [
+                {name: "HeyGen", description: "Avatar video generator", tier: "Freemium", url: "https://www.heygen.com"},
+                {name: "Synthesia", description: "AI presenter and avatar videos", tier: "Paid", url: "https://www.synthesia.io"},
+                {name: "Colossyan", description: "Actor-led training and marketing videos", tier: "Paid", url: "https://www.colossyan.com"},
+                {name: "Tavus", description: "Personalized video automation for UGC", tier: "Paid", url: "https://www.tavus.io"},
+                {name: "DeepBrain", description: "Realistic, human-like AI avatars", tier: "Paid", url: "https://deepbrain.ai"},
+                {name: "Synthesys", description: "AI influencer and TikTok content", tier: "Paid", url: "https://www.synthesys.io/tiktok"}
+            ],
+            "✂️ AI Video Editing & Tools": [
+                {name: "VHSynth", description: "Applies retro VHS effects to video", tier: "Free", url: "https://vhsynth.com"},
+                {name: "Descript", description: "Text-based podcast and video editing", tier: "Freemium", url: "https://www.descript.com"},
+                {name: "CapCut AI", description: "Trend-optimized edits for social media", tier: "Freemium", url: "https://www.capcut.com/ai-tools"},
+                {name: "Unscreen", description: "AI video background removal", tier: "Freemium", url: "https://unscreen.com"},
+                {name: "Synclabs", description: "AI-powered lip-syncing and dubbing", tier: "Freemium", url: "https://synclabs.so/lipsync"},
+                {name: "Premiere Pro AI", description: "Auto-reframing and editing features", tier: "Paid", url: "https://www.adobe.com/sensei/ai-video-editing"}
+            ],
+            "🖼️ 2D Image & Asset Generation": [
+                {name: "Stable Diffusion", description: "Open-source image generation model", tier: "Free", url: "https://stability.ai/stable-diffusion"},
+                {name: "PixelCraft", description: "Text-to-8-bit game assets", tier: "Free", url: "https://pixelcraft.ai"},
+                {name: "Midjourney", description: "High-quality text-to-image generation", tier: "Freemium", url: "https://www.midjourney.com"},
+                {name: "Leonardo.Ai", description: "Game asset and artistic image generation", tier: "Freemium", url: "https://leonardo.ai"},
+                {name: "Canva Pro", description: "AI-assisted graphic design platform", tier: "Freemium", url: "https://canva.com"},
+                {name: "Krea", description: "Real-Time Live canvas for image generation", tier: "Freemium", url: "https://app.krea.ai"},
+                {name: "Artbreeder", description: "Hybrid image and gene creation", tier: "Freemium", url: "https://www.artbreeder.com"},
+                {name: "Remove.bg", description: "AI image background removal", tier: "Freemium", url: "https://remove.bg"},
+                {name: "Vizualize", description: "E-commerce product shots", tier: "Paid", url: "https://vizualize.me"},
+                {name: "GetImg.ai", description: "Bulk image generation via API", tier: "Paid", url: "https://getimg.ai"},
+                {name: "Thumbnail AI", description: "AI-generated video thumbnails", tier: "Paid", url: "https://thumbnail.ai"}
+            ],
+            "🧊 3D Modeling & Animation": [
+                {name: "Plask", description: "Browser-based motion capture", tier: "Free", url: "https://plask.ai"},
+                {name: "Blender", description: "Open-source 3D animation suite", tier: "Free", url: "https://www.blender.org"},
+                {name: "TripoSR", description: "Converts image to 3D model", tier: "Free", url: "https://tripo3d.ai"},
+                {name: "Spline AI", description: "3D web design and scene generation", tier: "Freemium", url: "https://spline.design/ai"},
+                {name: "Masterpiece Studio", description: "VR/3D creation suite", tier: "Freemium", url: "https://masterpiecestudio.com"},
+                {name: "DeepMotion", description: "Video-to-3D animation and mocap", tier: "Freemium", url: "https://deepmotion.com"},
+                {name: "RADiCAL", description: "Markerless motion capture from video", tier: "Freemium", url: "https://radical.xyz"},
+                {name: "Cascadeur", description: "Physics-based 3D animation", tier: "Freemium", url: "https://cascadeur.com"},
+                {name: "Kaedim", description: "AI-powered image-to-3D conversion", tier: "Paid", url: "https://www.kaedim3d.com"},
+                {name: "3DFY", description: "Text-to-3D model generation", tier: "Paid", url: "https://3dfy.ai"},
+                {name: "PrintGPT", description: "Generates 3D printable files", tier: "Paid", url: "https://printgpt.ai"}
+            ],
+            "🎙️ Voice & Audio": [
+                {name: "ElevenLabs", description: "Hyperrealistic text-to-speech", tier: "Free", url: "https://elevenlabs.io"},
+                {name: "Whisper.cpp", description: "Open-source speech recognition", tier: "Free", url: "https://github.com/ggerganov/whisper.cpp"},
+                {name: "Audacity", description: "Audio editor with AI plugin support", tier: "Free", url: "https://www.audacityteam.org"},
+                {name: "Resemble AI", description: "Voice cloning and speech-to-singing", tier: "Freemium", url: "https://www.resemble.ai"},
+                {name: "Murf", description: "Studio-quality voice cloning and TTS", tier: "Paid", url: "https://murf.ai"},
+                {name: "Respeecher", description: "High-end voice cloning for characters", tier: "Paid", url: "https://respeecher.com"}
+            ],
+            "🎵 Music & Sound Generation": [
+                {name: "ChipTune", description: "Text-to-NES-style 8-bit music", tier: "Free", url: "https://chiptune.ai"},
+                {name: "Suno AI", description: "Music and song generation from text", tier: "Freemium", url: "https://suno.ai"},
+                {name: "AIVA", description: "AI music composition for soundtracks", tier: "Freemium", url: "https://aiva.ai"},
+                {name: "Beatly", description: "AI music videos and audio visualizers", tier: "Freemium", url: "https://beatly.io"},
+                {name: "Mubert", description: "Audio-reactive visuals and music", tier: "Freemium", url: "https://mubert.com/render"},
+                {name: "Soundraw", description: "AI music generator for creators", tier: "Freemium", url: "https://soundraw.io"},
+                {name: "Soundful", description: "AI-powered music and SFX generation", tier: "Freemium", url: "https://soundful.com"},
+                {name: "Boomy SFX", description: "Generative sound effects", tier: "Freemium", url: "https://boomy.com/sfx"},
+                {name: "Splash Pro", description: "AI music and band promo videos", tier: "Paid", url: "https://splashmusic.com"},
+                {name: "MakeMusic", description: "Converts audio to sheet music", tier: "Paid", url: "https://makemusic.com"}
+            ],
+            "🎧 Podcast & Audio Production": [
+                {name: "Riverside.fm", description: "HD remote recording with AI editing", tier: "Freemium", url: "https://riverside.com"},
+                {name: "Podcastle", description: "Complete podcast creation suite", tier: "Freemium", url: "https://podcastle.ai"},
+                {name: "CoHost", description: "Automated transcription and distribution", tier: "Paid", url: "https://www.cohostpodcasting.com"},
+                {name: "Glyph AI", description: "Podcast transcription and analysis", tier: "Paid", url: "https://www.joinglyph.com"}
+            ],
+            "📱 Social Media & Content Repurposing": [
+                {name: "Pictory", description: "Converts long-form to short videos", tier: "Freemium", url: "https://pictory.ai"},
+                {name: "Vidyo.ai", description: "Clips long videos into shorts", tier: "Freemium", url: "https://vidyo.ai"},
+                {name: "OpusClip", description: "Generates viral clips from videos", tier: "Freemium", url: "https://opus.ai"},
+                {name: "Predis.ai", description: "Auto-generates Instagram content", tier: "Freemium", url: "https://predis.ai"},
+                {name: "Buffer AI", description: "Cross-platform scheduling", tier: "Freemium", url: "https://buffer.com/ai"},
+                {name: "Hootsuite OwlyWriter", description: "AI content generation", tier: "Paid", url: "https://www.hootsuite.com/ai"},
+                {name: "SocialBee", description: "Evergreen content and recycling", tier: "Paid", url: "https://socialbee.com/ai-social-media"},
+                {name: "Flick", description: "Social media AI copilot", tier: "Paid", url: "https://flick.social"},
+                {name: "Repurpose.io", description: "Platform-to-platform automation", tier: "Paid", url: "https://repurpose.io"},
+                {name: "Ocoya", description: "AI social media scheduling", tier: "Paid", url: "https://www.ocoya.com"},
+                {name: "FeedHive", description: "Content recycling and posting", tier: "Paid", url: "https://feedhive.io"},
+                {name: "StoryChief", description: "Multi-platform story creation", tier: "Paid", url: "https://storychief.io/ai-social-media"},
+                {name: "Tailwind Ghostwriter", description: "AI for Pinterest and Instagram", tier: "Paid", url: "https://www.tailwindapp.com/ai"},
+                {name: "PinGenerator", description: "Viral pin designs generator", tier: "Paid", url: "https://pingenerator.ai"}
+            ],
+            "📊 Infographics & Presentations": [
+                {name: "Flourish", description: "Animated infographics and data viz", tier: "Freemium", url: "https://flourish.studio"},
+                {name: "Gamma", description: "AI presentation and doc maker", tier: "Freemium", url: "https://gamma.app"},
+                {name: "Visme AI", description: "Converts data to infographics", tier: "Freemium", url: "https://www.visme.co/ai-infographic-maker"},
+                {name: "Beautiful.ai", description: "Smart presentation designer", tier: "Paid", url: "https://www.beautiful.ai"},
+                {name: "Venngage", description: "Template-based infographic generator", tier: "Paid", url: "https://venngage.com/ai-infographic"},
+                {name: "PosterAI", description: "Generates movie-style posters", tier: "Paid", url: "https://posterai.co"},
+                {name: "Designs.ai", description: "AI-powered marketing posters", tier: "Paid", url: "https://designs.ai/postermaker"},
+                {name: "Tome", description: "Interactive storytelling presentations", tier: "Paid", url: "https://tome.app"}
+            ],
+            "📜 Scriptwriting & Content": [
+                {name: "ChatGPT", description: "Conversational AI for ideas and drafts", tier: "Freemium", url: "https://chat.openai.com"},
+                {name: "Notion AI", description: "AI writing assistant in workspace", tier: "Freemium", url: "https://www.notion.so/product/ai"},
+                {name: "Jasper", description: "Enterprise-grade writing assistant", tier: "Paid", url: "https://www.jasper.ai"},
+                {name: "Copy.ai", description: "Ad, social, and video scripts", tier: "Paid", url: "https://www.copy.ai"},
+                {name: "Sudowrite", description: "AI for creative storytelling", tier: "Paid", url: "https://www.sudowrite.com"},
+                {name: "Writesonic", description: "SEO-focused content creation", tier: "Paid", url: "https://writesonic.com"},
+                {name: "Grammarly Business", description: "Professional writing assistant", tier: "Paid", url: "https://www.grammarly.com/business"}
+            ],
+            "🎓 Course Creation": [
+                {name: "CourseAI", description: "Full course generator from prompt", tier: "Paid", url: "https://courseai.com"},
+                {name: "LearnWorlds AI", description: "AI assistant for interactive courses", tier: "Paid", url: "https://www.learnworlds.com/ai"},
+                {name: "Owwlish", description: "AI-powered digital course builder", tier: "Paid", url: "https://owwlish.com/ai"}
+            ],
+            "🕹️ Game Development & XR": [
+                {name: "Inworld AI", description: "NPCs for games", tier: "Freemium", url: "https://inworld.ai"},
+                {name: "Spline AI", description: "3D web scenes in browser", tier: "Freemium", url: "https://spline.design/ai"},
+                {name: "Leonardo Canvas", description: "Interactive scene builder", tier: "Freemium", url: "https://leonardo.ai/canvas"},
+                {name: "Zappar", description: "AR game creation platform", tier: "Paid", url: "https://zappar.com"},
+                {name: "Ludo AI", description: "Text-to-full game prototypes", tier: "Paid", url: "https://ludo.ai"},
+                {name: "Promethean AI", description: "Auto-generates game assets", tier: "Paid", url: "https://prometheanai.com"},
+                {name: "Scenario XL", description: "Custom game asset engine", tier: "Paid", url: "https://scenario.gg"},
+                {name: "Mattercraft", description: "Browser-based WebXR creation", tier: "Paid", url: "https://mattercraft.io"}
+            ],
+            "💼 Business & Enterprise AI": [
+                {name: "Vanna.ai", description: "RAG-powered SQL generation", tier: "Freemium", url: "https://vanna.ai"},
+                {name: "AI2SQL", description: "Natural language to SQL", tier: "Freemium", url: "https://ai2sql.io"},
+                {name: "FinChat.io", description: "Investment research platform", tier: "Freemium", url: "https://finchat.io"},
+                {name: "Chatbase", description: "Custom AI agents for support", tier: "Freemium", url: "https://www.chatbase.co"},
+                {name: "Spellbook", description: "Word-integrated contract review", tier: "Paid", url: "https://www.spellbook.legal"},
+                {name: "Harvey AI", description: "Enterprise legal platform", tier: "Paid", url: "https://www.harvey.ai"},
+                {name: "Kavout", description: "AI financial research agents", tier: "Paid", url: "https://www.kavout.com"},
+                {name: "HireVue", description: "AI video interviewing", tier: "Paid", url: "https://www.hirevue.com"},
+                {name: "Zendesk AI", description: "Integrated customer service AI", tier: "Paid", url: "https://www.zendesk.com/service/ai/"},
+                {name: "Ada.cx", description: "Autonomous customer service agents", tier: "Paid", url: "https://www.ada.cx"},
+                {name: "Vapi.ai", description: "Developer-first voice AI", tier: "Paid", url: "https://vapi.ai"},
+                {name: "Bland.ai", description: "Simple voice agent deployment", tier: "Paid", url: "https://bland.ai"},
+                {name: "Retell AI", description: "B2B phone automation", tier: "Paid", url: "https://www.retellai.com"}
+            ],
+            "💻 Developer & Technical AI": [
+                {name: "Jupyter Notebooks", description: "AI research environment", tier: "Free", url: "https://jupyter.org"},
+                {name: "StableCode", description: "Open-source code generation", tier: "Free", url: "https://stability.ai/stablecode"},
+                {name: "AutoGen Studio", description: "Framework for multi-agent systems", tier: "Free", url: "https://microsoft.github.io/autogen"},
+                {name: "CrewAI", description: "Role-based agent teams", tier: "Free", url: "https://www.crewai.com"},
+                {name: "n8n", description: "Self-hosted workflow automation", tier: "Freemium", url: "https://n8n.io"},
+                {name: "Make", description: "Advanced automation builder", tier: "Freemium", url: "https://make.com"},
+                {name: "Codium AI", description: "Test-driven development", tier: "Freemium", url: "https://codium.ai"},
+                {name: "PluginCrafter", description: "Generates AE/Premiere scripts", tier: "Paid", url: "https://plugincrafter.ai"},
+                {name: "ResolveCoder", description: "Generates DaVinci Fusion macros", tier: "Paid", url: "https://resolvecoder.dev"}
+            ],
+            "💡 Productivity & Assistants": [
+                {name: "Otter.ai", description: "Real-time meeting transcription", tier: "Freemium", url: "https://otter.ai"},
+                {name: "Fireflies.ai", description: "Conversation intelligence platform", tier: "Freemium", url: "https://fireflies.ai"},
+                {name: "Shortwave", description: "AI email automation agent", tier: "Freemium", url: "https://www.shortwave.com"},
+                {name: "SaneBox", description: "Intelligent inbox filtering", tier: "Paid", url: "https://www.sanebox.com"},
+                {name: "Superhuman", description: "AI-powered email client", tier: "Paid", url: "https://superhuman.com"},
+                {name: "Lindy", description: "Personal AI employee", tier: "Paid", url: "https://www.lindy.ai"},
+                {name: "Zapier Central", description: "AI automation assistant", tier: "Paid", url: "https://zapier.com/central"}
+            ],
+            "🏠 Lifestyle & Niche Tools": [
+                {name: "Comicgen", description: "Text-to-comic strip generator", tier: "Free", url: "https://comicgen.org"},
+                {name: "KnitGen", description: "Image-to-knitting patterns", tier: "Free", url: "https://knitgen.com"},
+                {name: "TactiVision", description: "Image-to-tactile graphics", tier: "Free", url: "https://tactivision.org"},
+                {name: "RoomGPT", description: "Personal room redesign", tier: "Freemium", url: "https://www.roomgpt.io"},
+                {name: "Spacely.ai", description: "Professional interior design", tier: "Paid", url: "https://www.spacely.ai"},
+                {name: "Osmo AI", description: "AI-powered scent generation", tier: "Paid", url: "https://osmo.ai"},
+                {name: "Cala AI", description: "AI-powered fashion design", tier: "Paid", url: "https://ca.la"}
+            ]
+        };
+
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        function getTierClass(tier) {
+            if (tier === 'Free') return 'tier-free';
+            if (tier === 'Freemium') return 'tier-freemium';
+            return 'tier-paid';
+        }
+
+        function renderTools() {
+            const container = document.getElementById('toolsContainer');
+            const noResults = document.getElementById('noResults');
+            const categoryList = document.getElementById('categoryList');
+            container.innerHTML = '';
+            categoryList.innerHTML = '';
+            let hasResults = false;
+
+            for (const category in toolsData) {
+                const tools = toolsData[category];
+                const filteredTools = tools.filter(tool => {
+                    const matchesTier = currentFilter === 'all' || tool.tier === currentFilter;
+                    const matchesSearch = searchQuery === '' || 
+                        tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        tool.description.toLowerCase().includes(searchQuery.toLowerCase());
+                    return matchesTier && matchesSearch;
+                });
+
+                if (filteredTools.length > 0) {
+                    hasResults = true;
+                    
+                    const categoryId = 'category-' + category.replace(/[^a-zA-Z0-9]/g, '-');
+                    
+                    const navItem = document.createElement('div');
+                    navItem.className = 'category-nav-item';
+                    navItem.textContent = category;
+                    navItem.onclick = function() {
+                        document.getElementById(categoryId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        document.getElementById('categoryList').classList.remove('open');
+                        document.getElementById('toggleIcon').textContent = '▼';
+                    };
+                    categoryList.appendChild(navItem);
+                    
+                    const section = document.createElement('div');
+                    section.className = 'category-section';
+                    section.id = categoryId;
+                    
+                    const header = document.createElement('div');
+                    header.className = 'category-header';
+                    
+                    const icon = document.createElement('span');
+                    icon.className = 'category-icon';
+                    icon.textContent = category.split(' ')[0];
+                    
+                    const title = document.createElement('h2');
+                    title.className = 'category-title';
+                    title.textContent = category;
+                    
+                    header.appendChild(icon);
+                    header.appendChild(title);
+                    
+                    const grid = document.createElement('div');
+                    grid.className = 'tools-grid';
+                    
+                    filteredTools.forEach(tool => {
+                        const card = document.createElement('div');
+                        card.className = 'tool-card';
+                        
+                        const cardHeader = document.createElement('div');
+                        cardHeader.className = 'tool-header';
+                        
+                        const nameDiv = document.createElement('div');
+                        const toolName = document.createElement('div');
+                        toolName.className = 'tool-name';
+                        toolName.textContent = tool.name;
+                        nameDiv.appendChild(toolName);
+                        
+                        const badge = document.createElement('span');
+                        badge.className = 'tier-badge ' + getTierClass(tool.tier);
+                        badge.textContent = tool.tier;
+                        
+                        cardHeader.appendChild(nameDiv);
+                        cardHeader.appendChild(badge);
+                        
+                        const desc = document.createElement('div');
+                        desc.className = 'tool-description';
+                        desc.textContent = tool.description;
+                        
+                        const footer = document.createElement('div');
+                        footer.className = 'tool-footer';
+                        
+                        const btn = document.createElement('a');
+                        btn.href = tool.url;
+                        btn.target = '_blank';
+                        btn.className = 'visit-btn';
+                        btn.textContent = 'Visit Site →';
+                        
+                        footer.appendChild(btn);
+                        
+                        card.appendChild(cardHeader);
+                        card.appendChild(desc);
+                        card.appendChild(footer);
+                        
+                        grid.appendChild(card);
+                    });
+                    
+                    section.appendChild(header);
+                    section.appendChild(grid);
+                    container.appendChild(section);
+                }
+            }
+
+            if (!hasResults) {
+                noResults.style.display = 'block';
+                container.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                container.style.display = 'block';
+            }
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.getAttribute('data-tier');
+                renderTools();
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchQuery = e.target.value;
+            renderTools();
+        });
+
+        document.getElementById('categoryToggle').addEventListener('click', function() {
+            const list = document.getElementById('categoryList');
+            const icon = document.getElementById('toggleIcon');
+            list.classList.toggle('open');
+            icon.textContent = list.classList.contains('open') ? '▲' : '▼';
+        });
+
+        renderTools();
+    </script>
+</body>
+</html>
