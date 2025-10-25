@@ -117,6 +117,107 @@
             margin-bottom: 2rem;
         }
 
+        .mobile-fixed-header {
+            display: none;
+            position: fixed;
+            top: -80px;
+            left: 0;
+            right: 0;
+            background: rgba(102, 126, 234, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: top 0.3s ease;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-fixed-header.visible {
+            top: 0;
+        }
+
+        .mobile-header-title {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .hamburger-menu {
+            width: 35px;
+            height: 35px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu:active {
+            transform: scale(0.95);
+        }
+
+        .hamburger-line {
+            width: 20px;
+            height: 3px;
+            background: #667eea;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu.open .hamburger-line:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger-menu.open .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.open .hamburger-line:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .mobile-dropdown {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 999;
+        }
+
+        .mobile-dropdown.open {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .mobile-dropdown-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 0.95rem;
+            color: #2d3748;
+        }
+
+        .mobile-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .mobile-dropdown-item:active {
+            background: #f7fafc;
+        }
+
         .category-nav-toggle {
             width: 100%;
             padding: 1rem;
@@ -168,10 +269,17 @@
             .category-nav {
                 display: block;
             }
+
+            .mobile-fixed-header {
+                display: flex;
+            }
         }
 
         .category-section {
             margin-bottom: 3rem;
+        }
+
+        .category-section.fade-in {
             animation: fadeInUp 0.8s ease;
         }
 
@@ -356,6 +464,17 @@
     </style>
 </head>
 <body>
+    <div class="mobile-fixed-header" id="mobileHeader">
+        <div class="mobile-header-title">🚀 AI Tools</div>
+        <button class="hamburger-menu" id="hamburgerBtn">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
+    </div>
+    
+    <div class="mobile-dropdown" id="mobileDropdown"></div>
+
     <div class="container">
         <header>
             <h1>🚀 AI Tools Directory</h1>
@@ -571,6 +690,9 @@
 
         let currentFilter = 'all';
         let searchQuery = '';
+        let isInitialLoad = true;
+        let lastScrollTop = 0;
+        let isDropdownOpen = false;
 
         function getTierClass(tier) {
             if (tier === 'Free') return 'tier-free';
@@ -582,8 +704,10 @@
             const container = document.getElementById('toolsContainer');
             const noResults = document.getElementById('noResults');
             const categoryList = document.getElementById('categoryList');
+            const mobileDropdown = document.getElementById('mobileDropdown');
             container.innerHTML = '';
             categoryList.innerHTML = '';
+            mobileDropdown.innerHTML = '';
             let hasResults = false;
 
             for (const category in toolsData) {
@@ -611,8 +735,20 @@
                     };
                     categoryList.appendChild(navItem);
                     
+                    const mobileNavItem = document.createElement('div');
+                    mobileNavItem.className = 'mobile-dropdown-item';
+                    mobileNavItem.textContent = category;
+                    mobileNavItem.onclick = function() {
+                        document.getElementById(categoryId).scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        closeMobileMenu();
+                    };
+                    mobileDropdown.appendChild(mobileNavItem);
+                    
                     const section = document.createElement('div');
                     section.className = 'category-section';
+                    if (isInitialLoad) {
+                        section.classList.add('fade-in');
+                    }
                     section.id = categoryId;
                     
                     const header = document.createElement('div');
@@ -624,7 +760,7 @@
                     
                     const title = document.createElement('h2');
                     title.className = 'category-title';
-                    title.textContent = category;
+                    title.textContent = category.substring(category.indexOf(' ') + 1);
                     
                     header.appendChild(icon);
                     header.appendChild(title);
@@ -687,7 +823,29 @@
                 noResults.style.display = 'none';
                 container.style.display = 'block';
             }
+            
+            isInitialLoad = false;
         }
+
+        function closeMobileMenu() {
+            document.getElementById('mobileDropdown').classList.remove('open');
+            document.getElementById('hamburgerBtn').classList.remove('open');
+            isDropdownOpen = false;
+        }
+
+        window.addEventListener('scroll', function() {
+            const mobileHeader = document.getElementById('mobileHeader');
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (currentScroll > 200 && currentScroll > lastScrollTop) {
+                mobileHeader.classList.add('visible');
+            } else if (currentScroll < lastScrollTop || currentScroll < 100) {
+                mobileHeader.classList.remove('visible');
+                closeMobileMenu();
+            }
+            
+            lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+        });
 
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -708,6 +866,15 @@
             const icon = document.getElementById('toggleIcon');
             list.classList.toggle('open');
             icon.textContent = list.classList.contains('open') ? '▲' : '▼';
+        });
+
+        document.getElementById('hamburgerBtn').addEventListener('click', function() {
+            const dropdown = document.getElementById('mobileDropdown');
+            const btn = document.getElementById('hamburgerBtn');
+            
+            isDropdownOpen = !isDropdownOpen;
+            dropdown.classList.toggle('open');
+            btn.classList.toggle('open');
         });
 
         renderTools();
