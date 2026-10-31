@@ -6,7 +6,7 @@ A static, browser-based directory of AI products across creative and technical c
 
 ## What is included
 
-The single `index.html` file contains the interface, styles, JavaScript, and a hard-coded catalog of **139 tool records** as found during the source review.
+The single `index.html` file contains the interface, styles, JavaScript, and a hard-coded catalog of **140 tool records** as found during the source review.
 
 Features implemented in the page:
 
